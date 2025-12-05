@@ -49,3 +49,58 @@ fn lz77_emit_reference_token(out: &mut impl Write, offset: u16, length: u16) -> 
     out.write_all(&length.to_le_bytes())?;
     Ok(5)
 }
+
+// -----------------------------------------------------------------------------
+// Match Finding
+// -----------------------------------------------------------------------------
+
+/// Computes how many bytes match between two positions in the input.
+#[inline]
+fn lz77_compute_match_length(
+    input: &[u8],
+    candidate: usize,
+    pos: usize,
+    max_len: usize,
+) -> usize {
+    let mut length = 0;
+    let max_possible = max_len.min(input.len() - pos);
+
+    while length < max_possible && input[candidate + length] == input[pos + length] {
+        length += 1;
+    }
+
+    length
+}
+
+/// Searches backward in the sliding window for the longest match.
+///
+/// This is a naive O(window_size) search for each position. It scans every
+/// position in the window and keeps track of the longest match found.
+///
+/// # Returns
+/// (offset, length) where offset is the distance backward from `pos`.
+/// Returns (0, 0) if no match of at least MIN_MATCH_LEN is found.
+fn lz77_find_longest_match(
+    input: &[u8],
+    pos: usize,
+    window_size: usize,
+    max_match_len: usize,
+) -> (usize, usize) {
+    let mut best_offset: usize = 0;
+    let mut best_length: usize = 0;
+
+    // Window spans from max(0, pos - window_size) to pos (exclusive)
+    let window_start = pos.saturating_sub(window_size);
+
+    // Try each candidate position in the window
+    for candidate in window_start..pos {
+        let length = lz77_compute_match_length(input, candidate, pos, max_match_len);
+        if length > best_length {
+            best_length = length;
+            best_offset = pos - candidate;
+        }
+    }
+
+    (best_offset, best_length)
+}
+
