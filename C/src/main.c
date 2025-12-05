@@ -151,7 +151,7 @@ int main(int argc, char ** argv)
     size_t input_len = 0;
     int free_input = 0;
 
-    if (input_len)
+    if (input_filename)
     {
         input = read_file(input_filename, &input_len);
         if (!input)
