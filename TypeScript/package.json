@@ -1,0 +1,37 @@
+{
+  "name": "lz77-typescript",
+  "version": "1.0.0",
+  "description": "A TypeScript implementation of the LZ77 compression algorithm",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "npx tsx src/lz77.test.ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "lz77",
+    "compression",
+    "decompression",
+    "lossless",
+    "algorithm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ]
+}
+
