@@ -1,3 +1,3 @@
-//! LZ77R - A Simple LZ77 Compressor Library
+//! lz77_r - A Simple LZ77 Compressor Library
 
 pub mod lz77;
