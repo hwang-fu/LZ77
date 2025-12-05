@@ -104,3 +104,35 @@ fn lz77_find_longest_match(
     (best_offset, best_length)
 }
 
+// -----------------------------------------------------------------------------
+// Core Compression Logic
+// -----------------------------------------------------------------------------
+
+fn lz77_compress(
+    input: &[u8],
+    out: &mut impl Write,
+    window_size: usize,
+    max_match_len: usize,
+) -> io::Result<u64> {
+    let mut bytes_written: u64 = 0;
+    let mut pos: usize = 0;
+
+    while pos < input.len() {
+        let (match_offset, match_length) = lz77_find_longest_match(input, pos, window_size, max_match_len);
+        if match_length >= LZ77_MIN_MATCH_LEN {
+            bytes_written += lz77_emit_reference_token(out, match_offset as u16, match_length as u16)?;
+            pos += match_length;
+
+            // Classic LZ77: emit the next byte as a literal (if any remain)
+            if pos < input.len() {
+                bytes_written += lz77_emit_literal_token(out, input[pos])?;
+                pos += 1;
+            }
+        } else {
+            bytes_written += lz77_emit_literal_token(out, input[pos])?;
+            pos += 1;
+        }
+    }
+
+    Ok(bytes_written)
+}
