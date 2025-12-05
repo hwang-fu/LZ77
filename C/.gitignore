@@ -1,0 +1,41 @@
+# Build artifacts (Make + cc)
+*.o
+*.d
+
+# Libraries produced by linking
+*.a
+*.so
+*.so.*
+*.dylib
+
+# Executables
+a.out
+*.out
+
+# Common build output directories
+build/
+bin/
+obj/
+out/
+
+# Coverage and profiling
+*.gcno
+*.gcda
+*.gcov
+gmon.out
+
+# Compiler cache
+.ccache/
+
+# Tags / indexers
+tags
+TAGS
+cscope.*
+
+# Editor/OS noise
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.clangd
