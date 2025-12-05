@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "lz77_r"
+name = "lz77r"
 version = "0.1.0"
