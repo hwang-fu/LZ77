@@ -4,19 +4,19 @@
 #include <stdint.h>
 
 /* Default compression parameters */
-#define LZ77_WINDOW_SIZE     4096
-#define LZ77_MAX_MATCH_LEN   258
-#define LZ77_MIN_MATCH_LEN   3
+#define LZ77_WINDOW_SIZE     (4096)
+#define LZ77_MAX_MATCH_LEN   (258)
+#define LZ77_MIN_MATCH_LEN   (3)
 
 /* Token types */
-#define LZ77_TOKEN_LITERAL   0x00
-#define LZ77_TOKEN_REFERENCE 0x01
+#define LZ77_TOKEN_LITERAL   (0x00)
+#define LZ77_TOKEN_REFERENCE (0x01)
 
 /* Result codes */
-#define LZ77_OK              0
-#define LZ77_ERR_NOMEM      -1
-#define LZ77_ERR_INVALID    -2
-#define LZ77_ERR_IO         -3
+#define LZ77_OK              (0)
+#define LZ77_ERR_NOMEM       (-1)
+#define LZ77_ERR_INVALID     (-2)
+#define LZ77_ERR_IO          (-3)
 
 /* Compression context */
 typedef struct {
@@ -36,15 +36,15 @@ typedef struct {
 void lz77_config_init(lz77_config_t * cfg);
 
 /* Compress input data, caller must free output->data */
-void lz77_compress(
+int32_t lz77_compress(
     const uint8_t * input,
-    size_t input_len
+    size_t input_len,
     lz77_buffer_t * output,
-    size_t lz77_config_t * cfg
+    const lz77_config_t * cfg
 );
 
 /* Decompress data, caller must free output->data */
-void lz77_decompress(const uint8_t * input, size_t input_len, lz77_buffer_t * output);
+int32_t lz77_decompress(const uint8_t * input, size_t input_len, lz77_buffer_t * output);
 
 /* Free buffer data */
 void lz77_buffer_free(lz77_buffer_t * buf);

@@ -116,13 +116,13 @@ int main(int argc, char ** argv)
                 decompress = 1;
                 break;
             case 'i':
-                input_file = optarg;
+                input_filename = optarg;
                 break;
             case 's':
                 input_string = optarg;
                 break;
             case 'o':
-                output_file = optarg;
+                output_filename = optarg;
                 break;
             case 'h':
                 print_usage(argv[0]);
@@ -151,7 +151,7 @@ int main(int argc, char ** argv)
     size_t input_len = 0;
     int free_input = 0;
 
-    if (input_file)
+    if (input_len)
     {
         input = read_file(input_filename, &input_len);
         if (!input)
@@ -178,7 +178,7 @@ int main(int argc, char ** argv)
     {
         lz77_config_t cfg = { 0 };
         lz77_config_init(&cfg);
-        result = lz77_compress(input, input_len, &output, &cfg);
+        rc = lz77_compress(input, input_len, &output, &cfg);
     }
 
     if (free_input)
@@ -204,7 +204,7 @@ int main(int argc, char ** argv)
         return 1;
     }
 
-    if (output_file)
+    if (output_filename)
     {
         rc = write_file(output_filename, output.data, output.len);
     }

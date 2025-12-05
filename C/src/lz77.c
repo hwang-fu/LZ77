@@ -99,7 +99,7 @@ static void lz77_find_match(
             match_len++;
         }
 
-        if (match_len >= min_match && match_len > *output)
+        if (match_len >= min_match && match_len > *out_length)
         {
             *out_offset = pos - i;
             *out_length = match_len;
@@ -122,11 +122,11 @@ void lz77_config_init(lz77_config_t * cfg)
     }
 }
 
-void lz77_compress(
+int32_t lz77_compress(
     const uint8_t * input,
-    size_t input_len
+    size_t input_len,
     lz77_buffer_t * output,
-    size_t lz77_config_t * cfg
+    const lz77_config_t * cfg
 )
 {
     output->data = malloc(LZ77_BUFFER_INITIAL_CAPACITY * sizeof(uint8_t));
@@ -145,7 +145,7 @@ void lz77_compress(
         size_t length = 0;
         lz77_find_match(
             input, input_len,
-            pos, cfg->window_size, cfg->min_match, cfg->max_len,
+            pos, cfg->window_size, cfg->min_match, cfg->max_match,
             &offset, &length
         );
 
@@ -188,7 +188,7 @@ fail:
     return LZ77_ERR_NOMEM;
 }
 
-void lz77_decompress(const uint8_t * input, size_t input_len, lz77_buffer_t * output)
+int32_t lz77_decompress(const uint8_t * input, size_t input_len, lz77_buffer_t * output)
 {
     output->data = malloc(LZ77_BUFFER_INITIAL_CAPACITY * sizeof(uint8_t));
     if (!output->data)
