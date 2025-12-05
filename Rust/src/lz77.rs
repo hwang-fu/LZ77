@@ -27,11 +27,11 @@ const LZ77_TOKEN_REFERENCE_MAGIC: u8 =  0x01;
 /// - Bytes 0-5: Magic "LZ77R1"
 /// - Bytes 6-7: window_size as u16 little-endian
 /// - Bytes 8-9: max_match_len as u16 little-endian
-fn write_header(out: &mut impl Write, window_szie: usize, max_match_len: usize) -> io::Result<u64> {
+fn write_header(out: &mut impl Write, window_szie: u16, max_match_len: u16) -> io::Result<u64> {
     out.write_all(LZ77_MAGIC)?;
     out.write_all(&window_szie.to_le_bytes())?;
     out.write_all(&max_match_len.to_le_bytes())?;
-    Ok(10)
+    Ok(9)
 }
 
 /// Emits a 2-byte literal token: [0x00][byte_value]
@@ -148,7 +148,7 @@ pub fn compress_bytes(
     max_match_len: usize,
 ) -> io::Result<u64> {
     let mut bytes_written: u64 = 0;
-    bytes_written += write_header(out, window_size, max_match_len)?;
+    bytes_written += write_header(out, window_size as u16, max_match_len as u16)?;
     bytes_written += compress(input, out, window_size, max_match_len)?;
     Ok(bytes_written)
 }
@@ -160,4 +160,47 @@ pub fn compress_str(
     max_match_len: usize,
 ) -> io::Result<u64> {
     compress(s.as_bytes(), out, window_size, max_match_len)
+}
+// -----------------------------------------------------------------------------
+// Tests
+// -----------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_compress_empty() {
+        let mut output = Vec::new();
+        let written = compress_bytes(&[], &mut output, 4096, 258).unwrap();
+        assert_eq!(written, 9);
+        assert_eq!(&output[0..5], b"LZ77R");
+    }
+
+    #[test]
+    fn test_compress_single_byte() {
+        let mut output = Vec::new();
+        let written = compress_bytes(b"A", &mut output, 4096, 258).unwrap();
+        // Header (9) + one literal (2)
+        assert_eq!(written, 11);
+    }
+
+    #[test]
+    fn test_compress_repeated() {
+        let mut output = Vec::new();
+        compress_bytes(b"aaaaaaaaaa", &mut output, 4096, 258).unwrap();
+        assert!(output.len() > 10);
+    }
+
+    #[test]
+    fn test_header_values() {
+        let mut output = Vec::new();
+        compress_bytes(b"test", &mut output, 1024, 128).unwrap();
+
+        let ws = u16::from_le_bytes([output[5], output[6]]);
+        assert_eq!(ws, 1024);
+
+        let mml = u16::from_le_bytes([output[7], output[8]]);
+        assert_eq!(mml, 128);
+    }
 }
