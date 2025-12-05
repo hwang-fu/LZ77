@@ -1,0 +1,8 @@
+[package]
+name = "LZ77R"
+version = "0.1.0"
+edition = "2024"
+description = "A naive LZ77 compressor using only the Rust standard library"
+
+# No external dependencies
+[dependencies]
